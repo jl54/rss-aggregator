@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -33,9 +34,12 @@ func main() {
 		log.Fatal("Can't connect to the database", err)
 	}
 
+	db := database.New(conn)
 	apiCfg := internal.ApiConfig{
-		DB: database.New(conn),
+		DB: db,
 	}
+
+	go internal.StartScraping(db, 10, time.Minute)
 
 	router := chi.NewRouter()
 
